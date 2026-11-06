@@ -1,0 +1,236 @@
+name: students-dwbi
+
+# ============================================================
+#  Students DWBI — Zero-Touch Stack (8 containers)
+#  By Mohammad Delshad
+#
+#  Key features:
+#   - MSSQL auto-restore .bak + auto-enable CDC
+#   - ClickHouse LZ4 compression (fixes Spark LZ4 magic byte error)
+#   - Airflow full bootstrap (migrate → admin → trigger DAGs)
+#   - Grafana ClickHouse plugin baked into image
+#   - All init SQL scripts auto-run on container start
+# ============================================================
+
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile.airflow
+  image: students-dwbi-airflow:latest
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__AUTH_MANAGER: "airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-apiserver:8080/execution/"
+    AIRFLOW__API_AUTH__JWT_SECRET: "m/eunUp1bSKBZtdbasCAzEZR5lXVkNqF9dEhDxuY5wI="
+    AIRFLOW__API_AUTH__JWT_EXPIRATION_TIME: "86400"
+    AIRFLOW__SCHEDULER__TASK_QUEUED_TIMEOUT: "3600"
+    AIRFLOW__CORE__PARALLELISM: "8"
+    PYTHONPATH: "/opt/airflow/spark-jobs"
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/logs:/opt/airflow/logs
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./spark-jobs:/opt/airflow/spark-jobs
+  user: "50000:0"
+
+services:
+
+  # ─────────────────────────────────────────────
+  #  1. MSSQL — restore .bak + enable CDC on startup
+  # ─────────────────────────────────────────────
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql-source
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+      MSSQL_PID: "Developer"
+      MSSQL_AGENT_ENABLED: "true"
+    entrypoint: ["/bin/bash", "/backup/entrypoint.sh"]
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./init-scripts/mssql:/backup
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  2. PostgreSQL staging — auto-runs *.sql
+  # ─────────────────────────────────────────────
+  postgres-staging:
+    image: postgres:16
+    container_name: postgres-staging
+    environment:
+      POSTGRES_USER: staging
+      POSTGRES_PASSWORD: staging
+      POSTGRES_DB: staging
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_staging_data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  3. PostgreSQL Airflow metadata
+  # ─────────────────────────────────────────────
+  postgres-airflow:
+    image: postgres:16
+    container_name: postgres-airflow
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - pg_airflow_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  4. ClickHouse — schema + LZ4 compression fix
+  #     XML mount forces LZ4 (Spark connector only supports LZ4)
+  # ─────────────────────────────────────────────
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.9
+    container_name: clickhouse-dw
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: StudentsDW
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: ""
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./init-scripts/clickhouse:/docker-entrypoint-initdb.d
+      # ⭐ CRITICAL: force LZ4 compression (overrides ClickHouse 26.9 ZSTD default)
+      - ./init-scripts/clickhouse/02-compression.xml:/etc/clickhouse-server/users.d/02-compression.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  5. Airflow APISERVER — full bootstrap
+  #     migrate → admin → api-server → wait DAGs → trigger full_load
+  # ─────────────────────────────────────────────
+  airflow-apiserver:
+    <<: *airflow-common
+    container_name: airflow-apiserver
+    entrypoint: ["/bin/bash", "/opt/airflow/plugins/init-apiserver.sh"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+      postgres-staging:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      mssql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v2/version', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 300s
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  6. Airflow SCHEDULER
+  # ─────────────────────────────────────────────
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    entrypoint: ["/bin/bash", "/opt/airflow/plugins/init-scheduler.sh"]
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+      airflow-apiserver:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  7. Airflow DAG-PROCESSOR
+  # ─────────────────────────────────────────────
+  airflow-dag-processor:
+    <<: *airflow-common
+    container_name: airflow-dag-processor
+    entrypoint: ["/bin/bash", "/opt/airflow/plugins/init-dag-processor.sh"]
+    depends_on:
+      postgres-airflow:
+        condition: service_healthy
+      airflow-apiserver:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  #  8. Grafana — ClickHouse plugin baked in
+  # ─────────────────────────────────────────────
+  grafana:
+    build:
+      context: .
+      dockerfile: Dockerfile.grafana
+    image: students-dwbi-grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_APP_MODE: development
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
+      GF_PLUGINS_PREINSTALL_ASYNC: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "grafana-clickhouse-datasource"
+      GF_INSTALL_PLUGINS: ""
+      GF_LOG_LEVEL: info
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  mssql_data:
+  pg_staging_data:
+  pg_airflow_data:
+  clickhouse_data:
+  grafana_data:

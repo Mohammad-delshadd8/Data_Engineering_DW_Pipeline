@@ -1,0 +1,19 @@
+# ============================================================
+#  Grafana 13 + ClickHouse plugin baked in
+#  Plugin is at ./grafana-plugins/grafana-clickhouse-datasource/
+#  (development mode bypasses signature check)
+# ============================================================
+FROM grafana/grafana:13.2.1
+
+USER root
+
+# Copy plugin from host (already extracted)
+COPY --chown=472:472 grafana-plugins/grafana-clickhouse-datasource \
+     /var/lib/grafana/plugins/grafana-clickhouse-datasource
+
+# Remove signature file — makes it "unsigned" but app_mode=development bypasses check
+RUN rm -f /var/lib/grafana/plugins/grafana-clickhouse-datasource/MANIFEST.txt && \
+    chmod -R 755 /var/lib/grafana/plugins/grafana-clickhouse-datasource && \
+    chmod +x /var/lib/grafana/plugins/grafana-clickhouse-datasource/gpx_clickhouse_linux_amd64 2>/dev/null || true
+
+USER grafana

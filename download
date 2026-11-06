@@ -1,0 +1,12 @@
+# Databases (too large for git)
+init-scripts/mssql/*.bak
+
+# Airflow runtime files
+airflow/logs/
+airflow/plugins/__pycache__/
+airflow/dags/__pycache__/
+*.pyc
+
+# System files
+.DS_Store
+Thumbs.db

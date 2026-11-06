@@ -1,0 +1,25 @@
+# ============================================================
+#  Airflow + Spark 3.5.6 + psycopg2
+#  JARs are NOT baked — they're mounted via ./spark-jobs/jars
+# ============================================================
+FROM bitnamilegacy/spark:3.5.6 AS spark
+
+FROM apache/airflow:3.3.1
+USER root
+
+# Java 17 + Spark 3.5.6 (from bitnami image — already local)
+COPY --from=spark /opt/bitnami/java  /opt/java
+COPY --from=spark /opt/bitnami/spark /opt/spark
+
+ENV JAVA_HOME=/opt/java \
+    SPARK_HOME=/opt/spark \
+    PATH=/opt/java/bin:/opt/spark/bin:$PATH \
+    PYSPARK_PYTHON=python3
+
+RUN chown -R airflow:root /opt/java /opt/spark && \
+    chmod -R g+rw /opt/java /opt/spark
+
+USER airflow
+
+# Python deps needed by SCD/CDC scripts
+RUN pip install --no-cache-dir psycopg2-binary requests
