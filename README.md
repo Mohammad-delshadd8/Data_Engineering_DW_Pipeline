@@ -136,7 +136,7 @@ The ClickHouse warehouse contains dimension and fact tables. The model follows a
 - `FactCourseOffering`
 - `FactEnrollment`
 
-![Data warehouse schema](docs/images/warehouse-schema.png)
+![Data warehouse schema](docs/images/Delshad_StudentsDW2.png)
 
 The following screenshots show the ClickHouse database and its tables:
 
@@ -210,9 +210,9 @@ The supplied dashboard examples include:
 - Application and enrollment distributions
 - Grade and course summaries
 
-![Grafana executive dashboard](docs/images/BI.png)
+![Grafana executive dashboard](docs/images/monitoring.png)
 
-![Grafana dashboard — additional view](docs/images/BI2.png)
+![Grafana dashboard — additional view](docs/images/monitoring2.png)
 
 Dashboard panels depend on the availability and quality of the underlying warehouse data. A panel displaying `No data` or a missing time-field message indicates that its query or time-series configuration may need further adjustment.
 
