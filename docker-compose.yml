@@ -1,15 +1,8 @@
 name: students-dwbi
 
 # ============================================================
-#  Students DWBI — Zero-Touch Stack (8 containers)
+#  Students DWBI 
 #  By Mohammad Delshad
-#
-#  Key features:
-#   - MSSQL auto-restore .bak + auto-enable CDC
-#   - ClickHouse LZ4 compression (fixes Spark LZ4 magic byte error)
-#   - Airflow full bootstrap (migrate → admin → trigger DAGs)
-#   - Grafana ClickHouse plugin baked into image
-#   - All init SQL scripts auto-run on container start
 # ============================================================
 
 x-airflow-common: &airflow-common
