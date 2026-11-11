@@ -34,7 +34,7 @@ x-airflow-common: &airflow-common
 services:
 
   # ─────────────────────────────────────────────
-  #  1. MSSQL — restore .bak + enable CDC on startup
+  #  1. MSSQL 
   # ─────────────────────────────────────────────
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -59,7 +59,7 @@ services:
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  #  2. PostgreSQL staging — auto-runs *.sql
+  #  2. PostgreSQL staging 
   # ─────────────────────────────────────────────
   postgres-staging:
     image: postgres:16
@@ -129,8 +129,7 @@ services:
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  #  5. Airflow APISERVER — full bootstrap
-  #     migrate → admin → api-server → wait DAGs → trigger full_load
+  #  5. Airflow APISERVER 
   # ─────────────────────────────────────────────
   airflow-apiserver:
     <<: *airflow-common
@@ -184,7 +183,7 @@ services:
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  #  8. Grafana — ClickHouse plugin baked in
+  #  8. Grafana
   # ─────────────────────────────────────────────
   grafana:
     build:
