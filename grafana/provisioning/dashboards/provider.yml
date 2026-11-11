@@ -1,0 +1,14 @@
+apiVersion: 1
+
+providers:
+  - name: 'students-dwbi'
+    orgId: 1
+    folder: 'Students DWBI'
+    folderUid: 'students-dwbi'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

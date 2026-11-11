@@ -1,0 +1,132 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }, "id": 1,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto" },
+      "targets": [{ "datasource": {"type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}"}, "queryType": "table", "rawSql": "SELECT count() AS value FROM system.tables WHERE database = 'StudentsDW'", "refId": "A", "format": 1 }],
+      "title": "DW Tables", "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 100}, {"color": "red", "value": 500}]}, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }, "id": 2,
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto" },
+      "targets": [{ "datasource": {"type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}"}, "queryType": "table", "rawSql": "SELECT count() AS value FROM system.parts WHERE database = 'StudentsDW' AND active = 1", "refId": "A", "format": 1 }],
+      "title": "Active Parts", "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 1}, {"color": "red", "value": 5}]}, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }, "id": 3,
+      "options": { "colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto" },
+      "targets": [{ "datasource": {"type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}"}, "queryType": "table", "rawSql": "SELECT count() AS value FROM system.mutations WHERE database = 'StudentsDW' AND NOT is_done", "refId": "A", "format": 1 }],
+      "title": "Pending Mutations", "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "bytes" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }, "id": 4,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto" },
+      "targets": [{ "datasource": {"type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}"}, "queryType": "table", "rawSql": "SELECT sum(bytes_on_disk) AS value FROM system.parts WHERE database = 'StudentsDW' AND active = 1", "refId": "A", "format": 1 }],
+      "title": "DW Disk Usage", "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }, "id": 5,
+      "options": { "colorMode": "value", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto" },
+      "targets": [{ "datasource": {"type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}"}, "queryType": "table", "rawSql": "SELECT sum(rows) AS value FROM system.parts WHERE database = 'StudentsDW' AND active = 1", "refId": "A", "format": 1 }],
+      "title": "Total Rows in DW", "type": "stat"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 50000000}]} }, "overrides": [
+        {"matcher": {"id": "byName", "options": "rows"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-background", "mode": "gradient"}}, {"id": "unit", "value": "short"}]},
+        {"matcher": {"id": "byName", "options": "bytes"}, "properties": [{"id": "unit", "value": "bytes"}]},
+        {"matcher": {"id": "byName", "options": "parts"}, "properties": [{"id": "custom.cellOptions", "value": {"type": "color-background"}}]}
+      ] },
+      "gridPos": { "h": 10, "w": 14, "x": 0, "y": 4 }, "id": 6,
+      "options": { "cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true },
+      "targets": [{
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "queryType": "table",
+        "rawSql": "SELECT t.name AS table_name, sum(p.rows) AS rows, count() AS parts, sum(p.bytes_on_disk) AS bytes FROM system.tables t LEFT JOIN system.parts p ON t.database = p.database AND t.name = p.table AND p.active = 1 WHERE t.database = 'StudentsDW' GROUP BY t.name ORDER BY rows DESC",
+        "refId": "A", "format": 1
+      }],
+      "title": "Table Row Counts & Parts (ClickHouse system tables)", "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]} }, "overrides": [
+        {"matcher": {"id": "byName", "options": "duration_ms"}, "properties": [{"id": "unit", "value": "ms"}]}
+      ] },
+      "gridPos": { "h": 10, "w": 10, "x": 14, "y": 4 }, "id": 7,
+      "options": { "cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true },
+      "targets": [{
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "queryType": "table",
+        "rawSql": "SELECT event_time, query_duration_ms AS duration_ms, substring(query, 1, 120) AS query_preview FROM system.query_log WHERE type = 'QueryFinish' AND event_time > now() - INTERVAL 10 MINUTE ORDER BY event_time DESC LIMIT 25",
+        "refId": "A", "format": 1
+      }],
+      "title": "Recent Queries (last 10 min)", "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "palette-classic"}, "custom": {"axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 30, "gradientMode": "opacity", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 }, "id": 8,
+      "options": { "legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"} },
+      "targets": [{
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "queryType": "table",
+        "rawSql": "SELECT toStartOfMinute(event_time) AS time, count() AS queries_per_min FROM system.query_log WHERE type = 'QueryFinish' AND event_time > now() - INTERVAL 1 HOUR GROUP BY time ORDER BY time",
+        "refId": "A", "format": 0
+      }],
+      "title": "Query Throughput (per minute, last hour)", "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "thresholds"}, "custom": {"align": "auto", "cellOptions": {"type": "auto"}, "inspect": false}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]} }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 }, "id": 9,
+      "options": { "cellHeight": "sm", "footer": {"countRows": false, "fields": "", "reducer": ["sum"], "show": false}, "showHeader": true },
+      "targets": [{
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "queryType": "table",
+        "rawSql": "SELECT 'DimStudent' AS table_name, count() AS total, countIf(IsCurrent = 1) AS current_v, countIf(IsCurrent = 0) AS historical_v FROM StudentsDW.DimStudent UNION ALL SELECT 'DimApplicant', count(), countIf(IsCurrent = 1), countIf(IsCurrent = 0) FROM StudentsDW.DimApplicant",
+        "refId": "A", "format": 1
+      }],
+      "title": "SCD2 Version Stats", "type": "table"
+    },
+    {
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+      "fieldConfig": { "defaults": { "color": {"mode": "palette-classic"}, "custom": {"axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "bars", "fillOpacity": 70, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode": "normal"}, "thresholdsStyle": {"mode": "off"}}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 22 }, "id": 10,
+      "options": { "legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true}, "tooltip": {"mode": "multi", "sort": "desc"} },
+      "targets": [{
+        "datasource": { "type": "grafana-clickhouse-datasource", "uid": "${DS_CLICKHOUSE}" },
+        "queryType": "table",
+        "rawSql": "SELECT toDate(LoadDateTime) AS time, table, count() AS inserts FROM (SELECT 'DimStudent' AS table, LoadDateTime FROM StudentsDW.DimStudent UNION ALL SELECT 'DimApplicant', LoadDateTime FROM StudentsDW.DimApplicant UNION ALL SELECT 'FactEnrollment', LoadDateTime FROM StudentsDW.FactEnrollment UNION ALL SELECT 'FactApplication', LoadDateTime FROM StudentsDW.FactApplication) WHERE LoadDateTime > now() - INTERVAL 7 DAY GROUP BY time, table ORDER BY time",
+        "refId": "A", "format": 0
+      }],
+      "title": "Pipeline Inserts per Day (last 7 days)", "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["students-dwbi", "ops", "monitoring"],
+  "templating": { "list": [
+    { "current": { "selected": false, "text": "ClickHouse-DW", "value": "ClickHouse-DW" }, "hide": 0, "includeAll": false, "label": "ClickHouse Datasource", "multi": false, "name": "DS_CLICKHOUSE", "options": [], "query": "grafana-clickhouse-datasource", "refresh": 1, "regex": "", "skipUrlSync": false, "type": "datasource" }
+  ]},
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Students DWBI — Pipeline Monitoring (Ops)",
+  "uid": "students-dwbi-ops",
+  "version": 1
+}

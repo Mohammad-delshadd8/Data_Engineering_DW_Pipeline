@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: ClickHouse-DW
+    type: grafana-clickhouse-datasource
+    access: proxy
+    jsonData:
+      host: clickhouse          
+      port: 8123
+      protocol: http
+      defaultDatabase: StudentsDW
+      username: default
+    secureJsonData:
+      password: ""
+    isDefault: true
+    editable: true

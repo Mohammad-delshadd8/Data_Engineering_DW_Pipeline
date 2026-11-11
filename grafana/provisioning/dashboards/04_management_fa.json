@@ -1,0 +1,205 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    { "type": "row", "title": "📌 خلاصه مدیریتی — شاخص‌های کلیدی عملکرد (KPI)", "collapsed": false, "gridPos": {"h":1,"w":24,"x":0,"y":0}, "id": 100, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"fixed","fixedColor":"blue"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"blue","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":5,"w":6,"x":0,"y":1}, "id": 1,
+      "options": {"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"vertical","reduceOptions":{"calcs":["lastNotNull"]},"textMode":"value_and_name","wideLayout":true},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT count() AS total_applicants FROM StudentsDW.DimApplicant","refId":"A","format":1}],
+      "title": "👥 کل متقاضیان ثبت‌نام", "type": "stat" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"fixed","fixedColor":"green"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":5,"w":6,"x":6,"y":1}, "id": 2,
+      "options": {"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"vertical","reduceOptions":{"calcs":["lastNotNull"]},"textMode":"value_and_name","wideLayout":true},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT count() AS active_students FROM StudentsDW.DimStudent WHERE IsCurrent = 1","refId":"A","format":1}],
+      "title": "🎓 دانشجویان فعال", "type": "stat" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"fixed","fixedColor":"purple"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"purple","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":5,"w":6,"x":12,"y":1}, "id": 3,
+      "options": {"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"vertical","reduceOptions":{"calcs":["lastNotNull"]},"textMode":"value_and_name","wideLayout":true},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT count() AS total_enrollments FROM StudentsDW.FactEnrollment","refId":"A","format":1}],
+      "title": "📚 کل ثبت‌نام در دروس", "type": "stat" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"fixed","fixedColor":"orange"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"orange","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":5,"w":6,"x":18,"y":1}, "id": 4,
+      "options": {"colorMode":"background","graphMode":"area","justifyMode":"center","orientation":"vertical","reduceOptions":{"calcs":["lastNotNull"]},"textMode":"value_and_name","wideLayout":true},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT count() AS active_courses FROM StudentsDW.DimCourse","refId":"A","format":1}],
+      "title": "📖 دوره‌های فعال", "type": "stat" },
+
+    { "type":"row", "title":"🎯 نرخ تبدیل قیف پذیرش", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":6}, "id": 101, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[]},"overrides":[]},
+      "gridPos": {"h":8,"w":8,"x":0,"y":7}, "id": 5,
+      "options": {"displayLabels":["name","value"],"legend":{"displayMode":"list","placement":"bottom","showLegend":true},"pieType":"pie","reduceOptions":{"calcs":["lastNotNull"]},"tooltip":{"mode":"single"}},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT ApplicationTypeCode AS app_type, count() AS applications FROM StudentsDW.FactApplication GROUP BY app_type ORDER BY applications DESC","refId":"A","format":1}],
+      "title": "📊 توزیع متقاضیان بر اساس نوع درخواست", "type": "piechart" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[]},"overrides":[]},
+      "gridPos": {"h":8,"w":8,"x":8,"y":7}, "id": 6,
+      "options": {"displayLabels":["name","value"],"legend":{"displayMode":"list","placement":"bottom","showLegend":true},"pieType":"donut","reduceOptions":{"calcs":["lastNotNull"]},"tooltip":{"mode":"single"}},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT ApplicationStatusCode AS status, count() AS cnt FROM StudentsDW.FactApplication GROUP BY status ORDER BY cnt DESC","refId":"A","format":1}],
+      "title": "🔄 وضعیت درخواست‌ها", "type": "piechart" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"red","value":null},{"color":"orange","value":30},{"color":"yellow","value":50},{"color":"green","value":70}]},"unit":"percent","decimals":1,"min":0,"max":100},"overrides":[]},
+      "gridPos": {"h":8,"w":8,"x":16,"y":7}, "id": 7,
+      "options": {"minVizHeight":75,"minVizWidth":75,"orientation":"auto","reduceOptions":{"calcs":["lastNotNull"]},"showThresholdLabels":true,"showThresholdMarkers":true,"sizing":"auto"},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT round(100.0 * countIf(ApplicationStatusCode = 'A') / count(), 2) AS acceptance_rate FROM StudentsDW.FactApplication","refId":"A","format":1}],
+      "title": "✅ نرخ پذیرش نهایی", "type": "gauge" },
+
+    { "type":"row", "title":"📈 روند زمانی و تحلیل رشد", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":15}, "id": 102, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"line","fillOpacity":40,"gradientMode":"opacity","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"smooth","lineWidth":3,"pointSize":6,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":9,"w":16,"x":0,"y":16}, "id": 8,
+      "options": {"legend":{"calcs":["sum","mean"],"displayMode":"table","placement":"right","showLegend":true},"tooltip":{"mode":"multi","sort":"desc"}},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT makeDate(d.YearNumber, d.MonthNumber, 1) AS time, count() AS applications FROM StudentsDW.FactApplication f JOIN StudentsDW.DimDate d ON f.ApplicationReceivedDateKey = d.DateKey WHERE d.YearNumber >= 2020 GROUP BY d.YearNumber, d.MonthNumber ORDER BY d.YearNumber, d.MonthNumber","refId":"A","format":0}],
+      "title": "📈 روند درخواست‌های پذیرش (ماهانه)", "type": "timeseries" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"bars","fillOpacity":80,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"never","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":9,"w":8,"x":16,"y":16}, "id": 9,
+      "options": {"barRadius":0,"barWidth":0.6,"groupWidth":0.7,"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":false},"orientation":"vertical","showValue":"always","stacking":"none","tooltip":{"mode":"single"},"xTickLabelRotation":0,"xTickLabelSpacing":100},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT toYear(d.FullDate) AS year, count() AS applications FROM StudentsDW.FactApplication f JOIN StudentsDW.DimDate d ON f.ApplicationReceivedDateKey = d.DateKey GROUP BY year ORDER BY year","refId":"A","format":1}],
+      "title": "📅 درخواست‌ها به تفکیک سال", "type": "barchart" },
+
+    { "type":"row", "title":"🎓 تحلیل دانشجویان", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":25}, "id": 103, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[]},"overrides":[]},
+      "gridPos": {"h":8,"w":6,"x":0,"y":26}, "id": 10,
+      "options": {"displayLabels":["name","percent"],"legend":{"displayMode":"table","placement":"right","showLegend":true,"values":["value","percent"]},"pieType":"donut","reduceOptions":{"calcs":["lastNotNull"]},"tooltip":{"mode":"single"}},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT Gender AS gender, count() AS cnt FROM StudentsDW.DimStudent WHERE IsCurrent = 1 GROUP BY gender","refId":"A","format":1}],
+      "title": "⚖️ توزیع جنسیتی دانشجویان", "type": "piechart" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[]},"overrides":[]},
+      "gridPos": {"h":8,"w":6,"x":6,"y":26}, "id": 11,
+      "options": {"displayLabels":["name","percent"],"legend":{"displayMode":"table","placement":"right","showLegend":true,"values":["value","percent"]},"pieType":"pie","reduceOptions":{"calcs":["lastNotNull"]},"tooltip":{"mode":"single"}},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT coalesce(cs.ClassStandingName, 'Unknown') AS standing, count() AS cnt FROM StudentsDW.DimStudent s LEFT JOIN StudentsDW.DimClassStanding cs ON s.ClassStandingCode = cs.ClassStandingCode WHERE s.IsCurrent = 1 GROUP BY standing","refId":"A","format":1}],
+      "title": "🎯 توزیع مقاطع تحصیلی", "type": "piechart" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"hideFrom":{"legend":false,"tooltip":false,"viz":false}},"mappings":[]},"overrides":[]},
+      "gridPos": {"h":8,"w":6,"x":12,"y":26}, "id": 12,
+      "options": {"displayLabels":["name","percent"],"legend":{"displayMode":"table","placement":"right","showLegend":true,"values":["value","percent"]},"pieType":"donut","reduceOptions":{"calcs":["lastNotNull"]},"tooltip":{"mode":"single"}},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT coalesce(DegreeLevelName, 'Unknown') AS level, count() AS cnt FROM StudentsDW.DimStudent WHERE IsCurrent = 1 GROUP BY level","refId":"A","format":1}],
+      "title": "🎓 توزیع سطوح تحصیلی", "type": "piechart" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"bars","fillOpacity":90,"gradientMode":"hue","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"never","spanNulls":false,"stacking":{"group":"A","mode":"normal"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":8,"w":6,"x":18,"y":26}, "id": 13,
+      "options": {"barRadius":0,"barWidth":0.7,"groupWidth":0.7,"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":false},"orientation":"horizontal","showValue":"always","stacking":"none","tooltip":{"mode":"single"},"xTickLabelRotation":0,"xTickLabelSpacing":100},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT State AS state, count() AS cnt FROM StudentsDW.DimStudent WHERE IsCurrent = 1 AND State != '' GROUP BY state ORDER BY cnt DESC LIMIT 10","refId":"A","format":1}],
+      "title": "🗺 پراکندگی جغرافیایی — ۱۰ استان برتر", "type": "barchart" },
+
+    { "type":"row", "title":"🏆 عملکرد آکادمیک", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":34}, "id": 104, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"red","value":null},{"color":"orange","value":60},{"color":"yellow","value":70},{"color":"green","value":80}]},"unit":"percent","decimals":1,"min":0,"max":100},"overrides":[]},
+      "gridPos": {"h":8,"w":6,"x":0,"y":35}, "id": 14,
+      "options": {"minVizHeight":75,"minVizWidth":75,"orientation":"auto","reduceOptions":{"calcs":["lastNotNull"]},"showThresholdLabels":true,"showThresholdMarkers":true,"sizing":"auto"},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT round(100.0 * countIf(g.GradeCode IN ('A','B','C','D','P')) / count(), 2) AS pass_rate FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimGrade g ON f.GradeKey = g.GradeKey WHERE g.GradeCode != ''","refId":"A","format":1}],
+      "title": "✅ نرخ قبولی کل", "type": "gauge" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"red","value":null},{"color":"orange","value":2.5},{"color":"green","value":3.0}]},"unit":"short","decimals":2,"min":0,"max":4},"overrides":[]},
+      "gridPos": {"h":8,"w":6,"x":6,"y":35}, "id": 15,
+      "options": {"minVizHeight":75,"minVizWidth":75,"orientation":"auto","reduceOptions":{"calcs":["lastNotNull"]},"showThresholdLabels":true,"showThresholdMarkers":true,"sizing":"auto"},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT round(avg(g.GradePoints), 2) AS avg_gpa FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimGrade g ON f.GradeKey = g.GradeKey WHERE g.IncludeInGpa = 1 AND g.GradePoints IS NOT NULL","refId":"A","format":1}],
+      "title": "📊 معدل کل دانشجویان", "type": "gauge" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"bars","fillOpacity":90,"gradientMode":"hue","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"never","spanNulls":false,"stacking":{"group":"A","mode":"normal"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":8,"w":12,"x":12,"y":35}, "id": 16,
+      "options": {"barRadius":0,"barWidth":0.7,"groupWidth":0.7,"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":false},"orientation":"vertical","showValue":"always","stacking":"none","tooltip":{"mode":"single"},"xTickLabelRotation":0,"xTickLabelSpacing":100},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT g.GradeCode AS grade, count() AS cnt FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimGrade g ON f.GradeKey = g.GradeKey WHERE g.GradeCode != '' GROUP BY grade ORDER BY grade","refId":"A","format":1}],
+      "title": "🏆 توزیع نمرات", "type": "barchart" },
+
+    { "type":"row", "title":"📚 عملکرد دروس و گروه‌های آموزشی", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":43}, "id": 105, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"bars","fillOpacity":90,"gradientMode":"hue","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"never","spanNulls":false,"stacking":{"group":"A","mode":"normal"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},
+      "gridPos": {"h":9,"w":12,"x":0,"y":44}, "id": 17,
+      "options": {"barRadius":0,"barWidth":0.6,"groupWidth":0.7,"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":false},"orientation":"horizontal","showValue":"always","stacking":"none","tooltip":{"mode":"single"},"xTickLabelRotation":0,"xTickLabelSpacing":100},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT concat(c.DepartmentCode, '-', toString(c.CourseNumber), ' ', c.CourseTitle) AS course, count() AS enrollments FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimCourse c ON f.CourseKey = c.CourseKey GROUP BY course ORDER BY enrollments DESC LIMIT 15","refId":"A","format":1}],
+      "title": "🔥 ۱۵ درس پرطرفدار", "type": "barchart" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisCenteredZero":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"bars","fillOpacity":90,"gradientMode":"hue","hideFrom":{"legend":false,"tooltip":false,"viz":false},"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"never","spanNulls":false,"stacking":{"group":"A","mode":"normal"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short","decimals":2},"overrides":[]},
+      "gridPos": {"h":9,"w":12,"x":12,"y":44}, "id": 18,
+      "options": {"barRadius":0,"barWidth":0.6,"groupWidth":0.7,"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":false},"orientation":"horizontal","showValue":"always","stacking":"none","tooltip":{"mode":"single"},"xTickLabelRotation":0,"xTickLabelSpacing":100},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT concat(c.DepartmentCode, '-', toString(c.CourseNumber), ' ', c.CourseTitle) AS course, round(avg(g.GradePoints), 2) AS avg_gpa FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimCourse c ON f.CourseKey = c.CourseKey JOIN StudentsDW.DimGrade g ON f.GradeKey = g.GradeKey WHERE g.GradePoints IS NOT NULL GROUP BY course, c.DepartmentCode, c.CourseNumber HAVING count() >= 20 ORDER BY avg_gpa ASC LIMIT 10","refId":"A","format":1}],
+      "title": "💀 ۱۰ درس سخت (پایین‌ترین معدل)", "type": "barchart" },
+
+    { "type":"row", "title":"⭐ برترین‌ها (Top Performers)", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":53}, "id": 106, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"inspect":false},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"yellow","value":3.5},{"color":"red","value":3.8}]}},"overrides":[
+        {"matcher":{"id":"byName","options":"avg_gpa"},"properties":[{"id":"custom.cellOptions","value":{"type":"color-background","mode":"gradient"}},{"id":"unit","value":"short"},{"id":"decimals","value":2},{"id":"displayName","value":"معدل"}]},
+        {"matcher":{"id":"byName","options":"student_id"},"properties":[{"id":"displayName","value":"کد دانشجو"}]},
+        {"matcher":{"id":"byName","options":"student_name"},"properties":[{"id":"displayName","value":"نام دانشجو"}]},
+        {"matcher":{"id":"byName","options":"degree"},"properties":[{"id":"displayName","value":"رشته"}]},
+        {"matcher":{"id":"byName","options":"standing"},"properties":[{"id":"displayName","value":"مقطع"}]},
+        {"matcher":{"id":"byName","options":"course_count"},"properties":[{"id":"displayName","value":"تعداد دروس"}]}
+      ]},
+      "gridPos": {"h":11,"w":12,"x":0,"y":54}, "id": 19,
+      "options": {"cellHeight":"sm","footer":{"countRows":true,"fields":"","reducer":["count"],"show":true},"showHeader":true,"sortBy":[{"desc":true,"displayName":"معدل"}]},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT s.StudentId AS student_id, concat(s.FirstName, ' ', s.LastName) AS student_name, coalesce(s.DegreeName, '') AS degree, coalesce(s.ClassStandingName, '') AS standing, round(avg(g.GradePoints), 2) AS avg_gpa, count() AS course_count FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimStudent s ON f.StudentKey = s.StudentKey AND s.IsCurrent = 1 JOIN StudentsDW.DimGrade g ON f.GradeKey = g.GradeKey WHERE g.IncludeInGpa = 1 AND g.GradePoints IS NOT NULL GROUP BY s.StudentId, student_name, degree, standing HAVING count() >= 10 ORDER BY avg_gpa DESC LIMIT 20","refId":"A","format":1}],
+      "title": "🏆 ۲۰ دانشجوی برتر بر اساس معدل", "type": "table" },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"inspect":false},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]}},"overrides":[
+        {"matcher":{"id":"byName","options":"applicant_id"},"properties":[{"id":"displayName","value":"کد متقاضی"}]},
+        {"matcher":{"id":"byName","options":"name"},"properties":[{"id":"displayName","value":"نام"}]},
+        {"matcher":{"id":"byName","options":"city"},"properties":[{"id":"displayName","value":"شهر"}]},
+        {"matcher":{"id":"byName","options":"gpa"},"properties":[{"id":"displayName","value":"معدل"},{"id":"decimals","value":2}]},
+        {"matcher":{"id":"byName","options":"admission_points"},"properties":[{"id":"displayName","value":"امتیاز پذیرش"},{"id":"decimals","value":2},{"id":"custom.cellOptions","value":{"type":"color-background","mode":"gradient"}}]}
+      ]},
+      "gridPos": {"h":11,"w":12,"x":12,"y":54}, "id": 20,
+      "options": {"cellHeight":"sm","footer":{"countRows":true,"fields":"","reducer":["count"],"show":true},"showHeader":true},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT a.ApplicantId AS applicant_id, concat(a.FirstName, ' ', a.LastName) AS name, a.City AS city, round(f.GPA, 2) AS gpa, f.AdmissionPoints AS admission_points FROM StudentsDW.FactApplication f JOIN StudentsDW.DimApplicant a ON f.ApplicantKey = a.ApplicantKey AND a.IsCurrent = 1 WHERE f.AdmissionPoints IS NOT NULL ORDER BY admission_points DESC LIMIT 20","refId":"A","format":1}],
+      "title": "⭐ ۲۰ متقاضی برتر بر اساس امتیاز پذیرش", "type": "table" },
+
+    { "type":"row", "title":"📋 جدول عملکرد جامع گروه‌های آموزشی", "collapsed":false, "gridPos":{"h":1,"w":24,"x":0,"y":65}, "id": 107, "panels": [] },
+
+    { "datasource": {"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},
+      "fieldConfig": {"defaults":{"color":{"mode":"thresholds"},"custom":{"align":"center","cellOptions":{"type":"auto"},"inspect":false},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]}},"overrides":[
+        {"matcher":{"id":"byName","options":"dept_code"},"properties":[{"id":"displayName","value":"کد گروه"}]},
+        {"matcher":{"id":"byName","options":"dept_name"},"properties":[{"id":"displayName","value":"نام گروه"}]},
+        {"matcher":{"id":"byName","options":"courses"},"properties":[{"id":"displayName","value":"تعداد دروس"}]},
+        {"matcher":{"id":"byName","options":"enrollments"},"properties":[{"id":"displayName","value":"تعداد ثبت‌نام"}]},
+        {"matcher":{"id":"byName","options":"avg_gpa"},"properties":[{"id":"displayName","value":"معدل"},{"id":"decimals","value":2},{"id":"custom.cellOptions","value":{"type":"color-background","mode":"gradient"}}]},
+        {"matcher":{"id":"byName","options":"pass_rate"},"properties":[{"id":"displayName","value":"نرخ قبولی %"},{"id":"unit","value":"percent"},{"id":"decimals","value":1},{"id":"custom.cellOptions","value":{"type":"color-background","mode":"gradient"}}]}
+      ]},
+      "gridPos": {"h":10,"w":24,"x":0,"y":66}, "id": 21,
+      "options": {"cellHeight":"md","footer":{"countRows":false,"fields":"","reducer":["sum"],"show":false},"showHeader":true,"sortBy":[{"desc":true,"displayName":"تعداد ثبت‌نام"}]},
+      "targets": [{"datasource":{"type":"grafana-clickhouse-datasource","uid":"${DS_CLICKHOUSE}"},"queryType":"table","rawSql":"SELECT d.DepartmentCode AS dept_code, d.DepartmentName AS dept_name, count(DISTINCT c.CourseKey) AS courses, count() AS enrollments, round(avg(g.GradePoints), 2) AS avg_gpa, round(100.0 * countIf(g.GradeCode IN ('A','B','C','D','P')) / count(), 1) AS pass_rate FROM StudentsDW.FactEnrollment f JOIN StudentsDW.DimCourse c ON f.CourseKey = c.CourseKey JOIN StudentsDW.DimDepartment d ON f.DepartmentKey = d.DepartmentKey JOIN StudentsDW.DimGrade g ON f.GradeKey = g.GradeKey WHERE g.GradeCode != '' GROUP BY d.DepartmentCode, d.DepartmentName ORDER BY enrollments DESC","refId":"A","format":1}],
+      "title": "📋 خلاصه عملکرد کلیه گروه‌های آموزشی", "type": "table" }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["students-dwbi","management","farsi","executive","persian"],
+  "templating": {"list":[
+    {"current":{"selected":false,"text":"ClickHouse-DW","value":"ClickHouse-DW"},"hide":0,"includeAll":false,"label":"منبع داده","multi":false,"name":"DS_CLICKHOUSE","options":[],"query":"grafana-clickhouse-datasource","refresh":1,"regex":"","skipUrlSync":false,"type":"datasource"}
+  ]},
+  "time": {"from":"now-5y","to":"now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "داشبورد مدیریتی — تحلیل جامع سامانه آموزش",
+  "uid": "students-dwbi-management-fa",
+  "version": 2,
+  "weekStart": ""
+}
