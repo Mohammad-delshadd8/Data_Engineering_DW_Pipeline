@@ -41,7 +41,7 @@ with DAG(
         env={
             "CDC_CONSUMER": "scd",
             "CDC_TABLES": "Students,Applicants",
-            # ⭐ لازم چون env جایگزین می‌شود:
+
             "JAVA_HOME": "/opt/java",
             "SPARK_HOME": "/opt/spark",
             "PATH": "/opt/java/bin:/opt/spark/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
