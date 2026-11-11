@@ -100,8 +100,7 @@ services:
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  #  4. ClickHouse — schema + LZ4 compression fix
-  #     XML mount forces LZ4 (Spark connector only supports LZ4)
+  #  4. ClickHouse 
   # ─────────────────────────────────────────────
   clickhouse:
     image: clickhouse/clickhouse-server:26.9
@@ -117,7 +116,6 @@ services:
     volumes:
       - clickhouse_data:/var/lib/clickhouse
       - ./init-scripts/clickhouse:/docker-entrypoint-initdb.d
-      # ⭐ CRITICAL: force LZ4 compression (overrides ClickHouse 26.9 ZSTD default)
       - ./init-scripts/clickhouse/02-compression.xml:/etc/clickhouse-server/users.d/02-compression.xml:ro
     ulimits:
       nofile:
